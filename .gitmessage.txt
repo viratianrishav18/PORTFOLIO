@@ -1,0 +1,29 @@
+# Commit message template for Portfoliop
+#
+# Format:
+# type(scope): short imperative summary
+#
+# Examples:
+# feat(hero): add animated intro headline
+# fix(contact): prevent duplicate submit
+# docs(readme): update setup instructions
+#
+# Allowed types: feat, fix, refactor, docs, test, chore, perf, ci, build
+#
+# Keep the subject concise (prefer <= 72 chars).
+# Add details below when needed.
+
+type(scope): summary in imperative mood
+
+# Why:
+#
+
+# What changed:
+#
+
+# Notes / risks:
+#
+
+# Footer (optional):
+# Closes #<issue-number>
+# BREAKING CHANGE: <description>

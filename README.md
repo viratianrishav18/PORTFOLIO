@@ -39,3 +39,28 @@ A next-generation, immersive 3D developer portfolio built with React, Three.js, 
    ```bash
    npm run build
    ```
+
+---
+
+## 🧭 Contribution and Git Workflow
+
+This repository includes a full, team-ready version control workflow.
+
+- Contribution standards: see [CONTRIBUTING.md](CONTRIBUTING.md)
+- Pull request checklist: see [.github/pull_request_template.md](.github/pull_request_template.md)
+- Commit message template: see [.gitmessage.txt](.gitmessage.txt)
+
+Set up the commit template once per local clone:
+
+```bash
+git config commit.template .gitmessage.txt
+```
+
+Recommended daily Git cycle:
+
+```bash
+git pull --rebase
+git add <changed-files>
+git commit
+git push
+```
