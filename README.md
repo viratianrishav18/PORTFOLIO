@@ -42,6 +42,63 @@ A next-generation, immersive 3D developer portfolio built with React, Three.js, 
 
 ---
 
+## Supabase Setup
+
+1. Create a local env file named `.env.local` and copy values from `.env.example`.
+
+2. Open `.env.local` and set your Supabase values:
+   - `SUPABASE_URL=https://yjvcjotugjmvdrzpdhkx.supabase.co`
+   - `SUPABASE_SERVICE_ROLE_KEY=your_service_role_key`
+   - `UPSTASH_REDIS_REST_URL=your_upstash_redis_rest_url`
+   - `UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_rest_token`
+
+3. Contact form now submits to server endpoint:
+   - `api/contact.js`
+   - Includes validation, honeypot bot check, and IP-based rate limiting.
+
+4. Run SQL migrations in Supabase SQL Editor (in order):
+   - `supabase/migrations/20260320_001_create_contact_messages.sql`
+   - `supabase/migrations/20260320_002_contact_messages_rls_and_view.sql`
+
+   If you prefer one-shot SQL, use:
+   ```sql
+   create table if not exists public.contact_messages (
+     id bigint generated always as identity primary key,
+     name text not null,
+     email text not null,
+     message text not null,
+     source text,
+     ip text,
+     created_at timestamptz not null default now()
+   );
+   ```
+
+5. If you enable Row Level Security on this table, add an insert policy:
+   ```sql
+   alter table public.contact_messages enable row level security;
+
+   create policy "Allow anonymous contact inserts"
+   on public.contact_messages
+   for insert
+   to anon
+   with check (true);
+   ```
+
+6. In Vercel, add these environment variables before redeploy:
+   - `SUPABASE_URL`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `UPSTASH_REDIS_REST_URL`
+   - `UPSTASH_REDIS_REST_TOKEN`
+
+7. Query the recent dashboard-ready view:
+   ```sql
+   select * from public.recent_contact_messages;
+   ```
+
+The project now stores contact submissions through a server route so secrets stay off the browser, with Redis-backed rate limiting and fallback in-memory limiting if Redis is unavailable.
+
+---
+
 ## 🧭 Contribution and Git Workflow
 
 This repository includes a full, team-ready version control workflow.

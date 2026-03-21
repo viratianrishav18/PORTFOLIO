@@ -305,7 +305,7 @@ export default function About() {
             {/* Skill bars */}
             <div>
               <h3 style={{
-                fontSize: '1rem', fontWeight: 600, color: '#e0e0f0',
+                fontWeight: 600, color: '#e0e0f0',
                 marginBottom: '1.5rem', letterSpacing: '0.05em',
                 textTransform: 'uppercase', fontSize: '0.8rem',
                 fontFamily: "'Space Grotesk', sans-serif",

@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { FiSend, FiArrowUpRight } from 'react-icons/fi'
+import { FiArrowUpRight } from 'react-icons/fi'
 import { EarthCanvas } from './canvas'
 
 export default function Contact() {
@@ -10,6 +10,8 @@ export default function Contact() {
   const [errors, setErrors] = useState({})
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+  const [website, setWebsite] = useState('')
   const [focused, setFocused] = useState(null)
 
   const validate = () => {
@@ -18,20 +20,47 @@ export default function Contact() {
     if (!form.email.trim()) e.email = 'Required'
     else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Invalid email'
     if (!form.message.trim()) e.message = 'Required'
+    else if (form.message.trim().length < 8) e.message = 'Please write a little more detail'
     setErrors(e)
     return Object.keys(e).length === 0
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setSubmitError('')
     if (!validate()) return
+
     setSending(true)
-    setTimeout(() => {
+    try {
+      const payload = {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        message: form.message.trim(),
+        website,
+      }
+
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+
+      const result = await response.json().catch(() => ({ ok: false }))
+      if (!response.ok || !result.ok) {
+        throw new Error(result.message || 'Failed to send message')
+      }
+
       setSending(false)
       setSent(true)
       setForm({ name: '', email: '', message: '' })
+      setWebsite('')
       setTimeout(() => setSent(false), 4000)
-    }, 1000)
+    } catch (error) {
+      setSending(false)
+      setSubmitError(error?.message || 'Message could not be sent right now. Please try again in a moment.')
+    }
   }
 
   const inputStyle = (field) => ({
@@ -145,6 +174,24 @@ export default function Contact() {
               {errors.message && <p style={{ color: '#ef4444', fontSize: '0.72rem', marginTop: '0.3rem', fontFamily: 'Inter, sans-serif' }}>{errors.message}</p>}
             </div>
 
+            {/* Honeypot field for bot detection */}
+            <input
+              type="text"
+              autoComplete="off"
+              tabIndex={-1}
+              aria-hidden="true"
+              value={website}
+              onChange={e => setWebsite(e.target.value)}
+              style={{
+                position: 'absolute',
+                left: '-10000px',
+                width: 1,
+                height: 1,
+                opacity: 0,
+                pointerEvents: 'none',
+              }}
+            />
+
             <button
               type="submit"
               disabled={sending}
@@ -160,12 +207,19 @@ export default function Contact() {
                 width: 'fit-content',
                 fontFamily: 'Inter, sans-serif',
                 boxShadow: sent ? '0 4px 20px rgba(34, 197, 94, 0.3)' : '0 4px 20px rgba(139, 92, 246, 0.3)',
+                opacity: 1,
               }}
               onMouseEnter={e => { if (!sending && !sent) e.currentTarget.style.transform = 'translateY(-2px)' }}
               onMouseLeave={e => e.currentTarget.style.transform = 'none'}
             >
               {sent ? '✓ Message Sent!' : sending ? 'Sending...' : <>Let's build something insane <FiArrowUpRight size={16} /></>}
             </button>
+
+            {submitError && (
+              <p style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: '-0.5rem', fontFamily: 'Inter, sans-serif' }}>
+                {submitError}
+              </p>
+            )}
           </form>
         </motion.div>
 
